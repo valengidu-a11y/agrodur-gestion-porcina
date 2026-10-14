@@ -7,193 +7,274 @@
 <meta name="theme-color" content="#173f2b">
 <title>AGRODUR | Gestión Porcina</title>
 <style>
-:root {
-  --verde:#173f2b;
-  --verde2:#286344;
-  --fondo:#f3f6f3;
-  --texto:#26352b;
-  --blanco:#fff;
-}
-* { box-sizing:border-box; }
-body {
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--fondo);
-  color:var(--texto);
-}
-header {
-  background:var(--verde);
-  color:white;
-  padding:24px 18px;
-}
-.marca { font-size:12px; letter-spacing:3px; }
-h1 { margin:8px 0 4px; font-size:27px; }
-header p { margin:0; color:#d9e8dd; }
-main { padding:18px; max-width:900px; margin:auto; }
-h2 { font-size:20px; }
-.grid {
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-}
-.tarjeta {
-  background:white;
-  padding:17px;
-  border-radius:14px;
-  border:1px solid #e1e8e1;
-}
-.numero { font-size:27px; font-weight:700; color:var(--verde2); }
-.etiqueta { font-size:13px; color:#69776d; }
-nav {
-  display:flex; gap:8px; overflow-x:auto;
-  padding:12px 0;
-}
-button {
-  border:0; border-radius:9px; padding:12px 15px;
-  background:var(--verde2); color:white;
-  font-size:14px; cursor:pointer;
-}
-nav button { flex-shrink:0; }
-nav button.sec { background:white; color:var(--verde); border:1px solid #d8e1d9; }
-.seccion {
-  background:white; border-radius:14px; padding:18px;
-  margin-top:15px;
-}
-label { display:block; font-size:14px; margin:12px 0 6px; }
-input,select,textarea {
-  width:100%; padding:12px; border:1px solid #cbd7cd;
-  border-radius:8px; background:white; font:inherit;
-}
-.campo { margin-bottom:12px; }
-.oculto { display:none; }
-.nota { color:#68766c; font-size:13px; line-height:1.5; }
-footer { text-align:center; padding:25px; font-size:12px; color:#718075; }
-@media(min-width:650px) {
-  .grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
-}
+:root{--verde:#173f2b;--verde2:#286344;--fondo:#f3f6f3;--texto:#26352b;--blanco:#fff}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--fondo);color:var(--texto)}
+header{background:var(--verde);color:white;padding:24px 18px}
+.marca{font-size:12px;letter-spacing:3px}
+h1{margin:8px 0 4px;font-size:27px}
+header p{margin:0;color:#d9e8dd}
+main{padding:18px;max-width:900px;margin:auto}
+h2{font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tarjeta{background:white;padding:17px;border-radius:14px;border:1px solid #e1e8e1}
+.numero{font-size:27px;font-weight:700;color:var(--verde2)}
+.etiqueta{font-size:13px;color:#69776d}
+nav{display:flex;gap:8px;overflow-x:auto;padding:12px 0}
+button{border:0;border-radius:9px;padding:12px 15px;background:var(--verde2);color:white;font-size:14px;cursor:pointer}
+nav button{flex-shrink:0}
+nav button.sec{background:white;color:var(--verde);border:1px solid #d8e1d9}
+.seccion{background:white;border-radius:14px;padding:18px;margin-top:15px}
+label{display:block;font-size:14px;margin:12px 0 6px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #cbd7cd;border-radius:8px;background:white;font:inherit}
+.campo{margin-bottom:12px}
+.oculto{display:none}
+.nota{color:#68766c;font-size:13px;line-height:1.5}
+footer{text-align:center;padding:25px;font-size:12px;color:#718075}
+#acceso{max-width:420px;margin:30px auto;padding:24px;background:white;border-radius:16px;box-shadow:0 4px 18px #0001}
+#appContenido[hidden]{display:none!important}
+#mensajeAcceso{font-size:14px;line-height:1.5}
+.acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.error{color:#a32626}
+@media(min-width:650px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<div id="acceso">
+<h2>Ingreso a AGRODUR</h2>
+<p class="nota">Inicia sesión con la cuenta autorizada de tu granja.</p>
+<form id="formAcceso">
+<div class="campo"><label for="correoAcceso">Correo electrónico</label><input id="correoAcceso" type="email" required autocomplete="username"></div>
+<div class="campo"><label for="claveAcceso">Contraseña</label><input id="claveAcceso" type="password" required autocomplete="current-password"></div>
+<button type="submit" style="width:100%">Iniciar sesión</button>
+<p id="mensajeAcceso" role="status"></p>
+</form>
+</div>
+
+<div id="appContenido" hidden>
 <header>
-  <div class="marca">AGRODUR · PRODUCCIÓN AGROPECUARIA</div>
-  <h1>Gestión Porcina</h1>
-  <p>Control y seguimiento de tu granja</p>
+<div class="marca">AGRODUR · PRODUCCIÓN AGROPECUARIA</div>
+<h1>Gestión Porcina</h1>
+<p>Control y seguimiento de tu granja</p>
 </header>
 <main>
-  <nav>
-    <button onclick="mostrar('inicio')">Inicio</button>
-    <button class="sec" onclick="mostrar('cerdas')">Cerdas</button>
-    <button class="sec" onclick="mostrar('partos')">Partos</button>
-    <button class="sec" onclick="mostrar('lechones')">Lechones</button>
-    <button class="sec" onclick="mostrar('compostaje')">Compostaje</button>
-  </nav>
+<div class="acciones"><span id="usuarioActual" class="nota"></span><button id="cerrarSesion" type="button">Cerrar sesión</button></div>
+<nav>
+<button type="button" onclick="mostrar('inicio')">Inicio</button>
+<button type="button" class="sec" onclick="mostrar('cerdas')">Cerdas</button>
+<button type="button" class="sec" onclick="mostrar('partos')">Partos</button>
+<button type="button" class="sec" onclick="mostrar('lechones')">Lechones</button>
+<button type="button" class="sec" onclick="mostrar('compostaje')">Compostaje</button>
+</nav>
 
-  <section id="inicio">
-    <h2>Panel principal</h2>
-    <p class="nota">Bienvenida a tu sistema de gestión de la granja.</p>
-    <div class="grid">
-      <div class="tarjeta"><div class="numero" id="nCerdas">0</div><div class="etiqueta">Cerdas registradas</div></div>
-      <div class="tarjeta"><div class="numero" id="nPartos">0</div><div class="etiqueta">Partos registrados</div></div>
-      <div class="tarjeta"><div class="numero" id="nLechones">0</div><div class="etiqueta">Lechones registrados</div></div>
-      <div class="tarjeta"><div class="numero" id="nCompost">0</div><div class="etiqueta">Zonas de compostaje</div></div>
-    </div>
-    <div class="seccion">
-      <h2>Bienvenida a AGRODUR</h2>
-      <p>Registra la información de tu granja y lleva el seguimiento de las actividades productivas.</p>
-      <p class="nota">Esta versión inicial es una demostración. Los datos no están conectados todavía a una base de datos.</p>
-    </div>
-  </section>
+<section id="inicio">
+<h2>Panel principal</h2>
+<p class="nota">Bienvenida a tu sistema de gestión de la granja.</p>
+<div class="grid">
+<div class="tarjeta"><div class="numero" id="nCerdas">0</div><div class="etiqueta">Cerdas registradas</div></div>
+<div class="tarjeta"><div class="numero" id="nPartos">0</div><div class="etiqueta">Partos registrados</div></div>
+<div class="tarjeta"><div class="numero" id="nLechones">0</div><div class="etiqueta">Lechones registrados</div></div>
+<div class="tarjeta"><div class="numero" id="nCompost">0</div><div class="etiqueta">Revisiones de compostaje</div></div>
+</div>
+<div class="seccion"><h2>Bienvenida a AGRODUR</h2><p>Registra la información de tu granja y lleva el seguimiento de las actividades productivas.</p><p id="estadoConexion" class="nota">Conectando...</p></div>
+</section>
 
-  <section id="cerdas" class="seccion oculto">
-    <h2>Registro de cerdas</h2>
-    <form onsubmit="registrar(event,'cerdas')">
-      <div class="campo"><label>Identificación de la cerda *</label><input name="id" required placeholder="Ej. CER-001"></div>
-      <div class="campo"><label>Fecha de nacimiento</label><input name="fecha" type="date"></div>
-      <div class="campo"><label>Estado</label><select name="estado"><option>Reemplazo</option><option>Vacía</option><option>En gestación</option><option>Próxima a parto</option><option>Lactancia</option></select></div>
-      <button>Registrar cerda</button>
-    </form>
-    <div id="listaCerdas"></div>
-  </section>
+<section id="cerdas" class="seccion oculto">
+<h2>Registro de cerdas</h2>
+<form onsubmit="registrar(event,'cerdas')">
+<div class="campo"><label>Identificación de la cerda *</label><input name="id" required placeholder="Ej. CER-001"></div>
+<div class="campo"><label>Fecha de nacimiento</label><input name="fecha" type="date"></div>
+<div class="campo"><label>Estado</label><select name="estado"><option>Reemplazo</option><option>Vacía</option><option>En gestación</option><option>Próxima a parto</option><option>Lactancia</option></select></div>
+<button type="submit">Registrar cerda</button>
+</form><div id="listaCerdas"></div>
+</section>
 
-  <section id="partos" class="seccion oculto">
-    <h2>Registro de partos</h2>
-    <form onsubmit="registrar(event,'partos')">
-      <div class="campo"><label>Identificación de la cerda *</label><input name="id" required placeholder="Ej. CER-001"></div>
-      <div class="campo"><label>Fecha del parto *</label><input name="fecha" type="date" required></div>
-      <div class="campo"><label>Nacidos vivos</label><input name="vivos" type="number" min="0" value="0" required></div>
-      <div class="campo"><label>Nacidos muertos</label><input name="muertos" type="number" min="0" value="0" required></div>
-      <button>Registrar parto</button>
-    </form>
-    <div id="listaPartos"></div>
-  </section>
+<section id="partos" class="seccion oculto">
+<h2>Registro de partos</h2>
+<form onsubmit="registrar(event,'partos')">
+<div class="campo"><label>Identificación de la cerda *</label><input name="id" required placeholder="Ej. CER-001"></div>
+<div class="campo"><label>Fecha del parto *</label><input name="fecha" type="date" required></div>
+<div class="campo"><label>Nacidos vivos</label><input name="vivos" type="number" min="0" value="0" required></div>
+<div class="campo"><label>Nacidos muertos</label><input name="muertos" type="number" min="0" value="0" required></div>
+<button type="submit">Registrar parto</button>
+</form><div id="listaPartos"></div>
+</section>
 
-  <section id="lechones" class="seccion oculto">
-    <h2>Registro de lechones</h2>
-    <form onsubmit="registrar(event,'lechones')">
-      <div class="campo"><label>Identificación de camada o lechón *</label><input name="id" required placeholder="Ej. CAM-001"></div>
-      <div class="campo"><label>Fecha de nacimiento *</label><input name="fecha" type="date" required></div>
-      <div class="campo"><label>Cantidad de lechones</label><input name="cantidad" type="number" min="1" value="1" required></div>
-      <div class="campo"><label>Peso promedio en kg</label><input name="peso" type="number" min="0" step="0.1"></div>
-      <button>Registrar lechones</button>
-    </form>
-    <div id="listaLechones"></div>
-  </section>
+<section id="lechones" class="seccion oculto">
+<h2>Registro de lechones</h2>
+<form onsubmit="registrar(event,'lechones')">
+<div class="campo"><label>Identificación de camada o lechón *</label><input name="id" required placeholder="Ej. CAM-001"></div>
+<div class="campo"><label>Fecha de nacimiento *</label><input name="fecha" type="date" required></div>
+<div class="campo"><label>Cantidad de lechones</label><input name="cantidad" type="number" min="1" value="1" required></div>
+<div class="campo"><label>Peso promedio en kg</label><input name="peso" type="number" min="0" step="0.1"></div>
+<button type="submit">Registrar lechones</button>
+</form><div id="listaLechones"></div>
+</section>
 
-  <section id="compostaje" class="seccion oculto">
-    <h2>Gestión de compostaje</h2>
-    <form onsubmit="registrar(event,'compostaje')">
-      <div class="campo"><label>Nombre de la zona *</label><input name="id" required placeholder="Ej. Cama 1"></div>
-      <div class="campo"><label>Fecha de revisión *</label><input name="fecha" type="date" required></div>
-      <div class="campo"><label>Temperatura (°C)</label><input name="temperatura" type="number" step="0.1"></div>
-      <div class="campo"><label>Humedad (%)</label><input name="humedad" type="number" min="0" max="100"></div>
-      <div class="campo"><label>Actividad realizada</label><select name="actividad"><option>Inspección</option><option>Volteo</option><option>Ajuste de humedad</option><option>Adición de material</option><option>Otra</option></select></div>
-      <div class="campo"><label>Observaciones</label><textarea name="observaciones" rows="3"></textarea></div>
-      <button>Registrar revisión</button>
-    </form>
-    <div id="listaCompostaje"></div>
-  </section>
+<section id="compostaje" class="seccion oculto">
+<h2>Gestión de compostaje</h2>
+<form onsubmit="registrar(event,'compostaje')">
+<div class="campo"><label>Nombre de la zona *</label><input name="id" required placeholder="Ej. Cama 1"></div>
+<div class="campo"><label>Fecha de revisión *</label><input name="fecha" type="date" required></div>
+<div class="campo"><label>Temperatura (°C)</label><input name="temperatura" type="number" step="0.1"></div>
+<div class="campo"><label>Humedad (%)</label><input name="humedad" type="number" min="0" max="100"></div>
+<div class="campo"><label>Actividad realizada</label><select name="actividad"><option>Inspección</option><option>Volteo</option><option>Ajuste de humedad</option><option>Adición de material</option><option>Otra</option></select></div>
+<div class="campo"><label>Observaciones</label><textarea name="observaciones" rows="3"></textarea></div>
+<button type="submit">Registrar revisión</button>
+</form><div id="listaCompostaje"></div>
+</section>
 </main>
 <footer>AGRODUR · Gestión Porcina</footer>
+</div>
 
 <script>
-const datos = {
-  cerdas:[], partos:[], lechones:[], compostaje:[]
+const SUPABASE_URL='https://rlhqwdetkfcgfnlzcduk.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_ReLPae7s8PaCXUgfiAMzlg_TRyqhEo4';
+const cliente=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const datos={cerdas:[],partos:[],lechones:[],compostaje:[]};
+const $=id=>document.getElementById(id);
+
+function mostrar(id){
+document.querySelectorAll('main > section').forEach(s=>s.classList.add('oculto'));
+$(id).classList.remove('oculto');
+window.scrollTo(0,0);
+}
+
+function actualizarContadores(){
+$('nCerdas').textContent=datos.cerdas.length;
+$('nPartos').textContent=datos.partos.length;
+$('nLechones').textContent=datos.lechones.reduce((s,x)=>s+Number(x.cantidad||0),0);
+$('nCompost').textContent=datos.compostaje.length;
+}
+
+function dibujar(tipo,item){
+const lista=$('lista'+tipo[0].toUpperCase()+tipo.slice(1));
+const tarjeta=document.createElement('div');
+tarjeta.className='tarjeta';
+tarjeta.style.marginTop='12px';
+const campos={
+cerdas:[['Identificación',item.codigo],['Nacimiento',item.fecha_nacimiento],['Estado',item.estado]],
+partos:[['Cerda',item._codigoCerda||item.cerda_id],['Fecha',item.fecha_parto],['Nacidos vivos',item.nacidos_vivos],['Nacidos muertos',item.nacidos_muertos]],
+lechones:[['Identificación',item.identificacion],['Nacimiento',item.fecha_nacimiento],['Cantidad',item.cantidad],['Peso promedio (kg)',item.peso_promedio_kg]],
+compostaje:[['Zona',item.zona],['Fecha revisión',item.fecha_revision],['Temperatura (°C)',item.temperatura_c],['Humedad (%)',item.humedad_porcentaje],['Actividad',item.actividad],['Observaciones',item.observaciones]]
 };
-
-function mostrar(id) {
-  document.querySelectorAll('main > section').forEach(s => s.classList.add('oculto'));
-  document.getElementById(id).classList.remove('oculto');
-  window.scrollTo(0,0);
+(campos[tipo]||[]).forEach(([k,v])=>{
+if(v!==null&&v!==undefined&&v!==''){
+const p=document.createElement('p');
+p.textContent=k+': '+v;
+tarjeta.appendChild(p);
+}
+});
+lista.prepend(tarjeta);
 }
 
-function registrar(event,tipo) {
-  event.preventDefault();
-  const form = event.target;
-  const item = Object.fromEntries(new FormData(form).entries());
-  datos[tipo].push(item);
-
-  const lista = document.getElementById('lista'+tipo[0].toUpperCase()+tipo.slice(1));
-  const tarjeta = document.createElement('div');
-  tarjeta.className = 'tarjeta';
-  tarjeta.style.marginTop = '12px';
-
-  Object.entries(item).forEach(([clave,valor]) => {
-    if (valor !== '') {
-      const p = document.createElement('p');
-      p.textContent = clave+': '+valor;
-      tarjeta.appendChild(p);
-    }
-  });
-  lista.prepend(tarjeta);
-  document.getElementById('nCerdas').textContent = datos.cerdas.length;
-  document.getElementById('nPartos').textContent = datos.partos.length;
-  document.getElementById('nLechones').textContent =
-    datos.lechones.reduce((s,x)=>s+Number(x.cantidad||0),0);
-  document.getElementById('nCompost').textContent = datos.compostaje.length;
-  form.reset();
-  alert('Registro agregado a esta sesión.');
+async function cargarDatos(){
+const consultas=[
+['cerdas','cerdas','codigo,fecha_nacimiento,estado,id'],
+['partos','partos','id,cerda_id,fecha_parto,nacidos_vivos,nacidos_muertos'],
+['lechones','lechones','id,identificacion,fecha_nacimiento,cantidad,peso_promedio_kg'],
+['compostaje','compostaje','id,zona,fecha_revision,temperatura_c,humedad_porcentaje,actividad,observaciones']
+];
+for(const [tipo,tabla,columnas] of consultas){
+const {data,error}=await cliente.from(tabla).select(columnas);
+if(error)throw new Error('No se pudo cargar '+tabla+': '+error.message);
+datos[tipo]=data||[];
+$('lista'+tipo[0].toUpperCase()+tipo.slice(1)).replaceChildren();
+if(tipo==='partos'){
+for(const p of datos[tipo]){
+const {data:c}=await cliente.from('cerdas').select('codigo').eq('id',p.cerda_id).maybeSingle();
+p._codigoCerda=c?.codigo||p.cerda_id;
 }
+}
+datos[tipo].forEach(item=>dibujar(tipo,item));
+}
+actualizarContadores();
+}
+
+async function comprobarSesion(session){
+if(!session){
+$('appContenido').hidden=true;
+$('acceso').hidden=false;
+return;
+}
+const {data:perfil,error}=await cliente.from('perfiles').select('nombre,rol').eq('id',session.user.id).maybeSingle();
+if(error||!perfil){
+await cliente.auth.signOut();
+$('appContenido').hidden=true;
+$('acceso').hidden=false;
+$('mensajeAcceso').textContent='Tu cuenta no tiene un perfil válido. Solicita a la administradora que revise tu acceso.';
+return;
+}
+$('acceso').hidden=true;
+$('appContenido').hidden=false;
+$('usuarioActual').textContent=(perfil.nombre||session.user.email)+' · '+perfil.rol;
+try{
+await cargarDatos();
+$('estadoConexion').textContent='Conectado a Supabase.';
+$('estadoConexion').className='nota';
+}catch(e){
+$('estadoConexion').textContent=e.message;
+$('estadoConexion').className='nota error';
+}
+}
+
+$('formAcceso').addEventListener('submit',async e=>{
+e.preventDefault();
+$('mensajeAcceso').textContent='Verificando acceso...';
+const {error}=await cliente.auth.signInWithPassword({
+email:$('correoAcceso').value.trim(),
+password:$('claveAcceso').value
+});
+if(error)$('mensajeAcceso').textContent='No se pudo iniciar sesión: '+error.message;
+});
+
+$('cerrarSesion').addEventListener('click',async()=>{
+await cliente.auth.signOut();
+location.reload();
+});
+
+async function registrar(event,tipo){
+event.preventDefault();
+const form=event.target;
+const v=Object.fromEntries(new FormData(form).entries());
+let tabla,item;
+if(tipo==='cerdas'){
+tabla='cerdas';
+item={codigo:v.id.trim(),fecha_nacimiento:v.fecha||null,estado:v.estado};
+}
+if(tipo==='partos'){
+const {data:cerda,error}=await cliente.from('cerdas').select('id,codigo').eq('codigo',v.id.trim()).maybeSingle();
+if(error||!cerda){alert('No encontré una cerda con ese código. Regístrala primero en Cerdas.');return;}
+tabla='partos';
+item={cerda_id:cerda.id,fecha_parto:v.fecha,nacidos_vivos:Number(v.vivos),nacidos_muertos:Number(v.muertos)};
+}
+if(tipo==='lechones'){
+tabla='lechones';
+item={identificacion:v.id.trim(),fecha_nacimiento:v.fecha,cantidad:Number(v.cantidad),peso_promedio_kg:v.peso===''?null:Number(v.peso)};
+}
+if(tipo==='compostaje'){
+tabla='compostaje';
+item={zona:v.id.trim(),fecha_revision:v.fecha,temperatura_c:v.temperatura===''?null:Number(v.temperatura),humedad_porcentaje:v.humedad===''?null:Number(v.humedad),actividad:v.actividad,observaciones:v.observaciones||null};
+}
+const boton=form.querySelector('button[type="submit"]');
+boton.disabled=true;
+const {data,error}=await cliente.from(tabla).insert(item).select().single();
+boton.disabled=false;
+if(error){alert('No se pudo guardar el registro: '+error.message);return;}
+if(tipo==='partos')data._codigoCerda=v.id.trim();
+datos[tipo].unshift(data);
+dibujar(tipo,data);
+actualizarContadores();
+form.reset();
+alert('Registro guardado en Supabase.');
+}
+
+cliente.auth.getSession().then(({data})=>comprobarSesion(data.session));
+cliente.auth.onAuthStateChange((_evento,session)=>{
+if(session)comprobarSesion(session);
+});
 </script>
 </body>
 </html>
+
