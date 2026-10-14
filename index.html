@@ -330,11 +330,15 @@ const {data,error}=await cliente
   .delete()
   .eq(columnaId,id)
   .select();
-
 if(error){
-  alert('Error al eliminar: '+error.message);
+  if(error.code==='23503'){
+    alert('No se puede eliminar este registro porque tiene información relacionada, como partos o lechones. Conserva el historial o retira el registro de uso.');
+  }else{
+    alert('No se pudo eliminar el registro: '+error.message);
+  }
   return;
 }
+
 
 if(!data || data.length===0){
   alert('No se eliminó ningún registro. Revisa los permisos o el identificador.');
