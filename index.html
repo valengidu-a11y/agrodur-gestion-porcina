@@ -334,7 +334,11 @@ if(error){
   if(error.code==='23503'){
     alert('No se puede eliminar este registro porque tiene información relacionada, como partos o lechones. Conserva el historial o retira el registro de uso.');
   }else{
-    alert('No se pudo eliminar el registro: '+error.message);
+    if(error.code==='23503'){
+  alert('No se puede eliminar esta cerda porque tiene partos asociados. Para conservar el historial, cambia su estado a retirada en lugar de eliminarla.');
+}else{
+  alert('No se pudo eliminar el registro: '+error.message);
+}
   }
   return;
 }
