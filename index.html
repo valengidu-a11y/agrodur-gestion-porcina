@@ -272,10 +272,25 @@ form.reset();
 alert('Registro guardado en Supabase.');
 }
 
-cliente.auth.getSession().then(({data})=>comprobarSesion(data.session));
-cliente.auth.onAuthStateChange((_evento,session)=>{
-if(session)comprobarSesion(session);
+$('formAcceso').addEventListener('submit', async e => {
+  e.preventDefault();
+  $('mensajeAcceso').textContent = 'Verificando acceso...';
+
+  const { data, error } = await cliente.auth.signInWithPassword({
+    email: $('correoAcceso').value.trim(),
+    password: $('claveAcceso').value
+  });
+
+  if (error) {
+    $('mensajeAcceso').textContent =
+      'No se pudo iniciar sesión: ' + error.message;
+    return;
+  }
+
+  await comprobarSesion(data.session);
 });
+
+
 </script>
 </body>
 </html>
