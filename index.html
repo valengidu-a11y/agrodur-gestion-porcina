@@ -170,7 +170,7 @@ tarjeta.appendChild(p);
 botonEliminar.type='button';
 botonEliminar.textContent='Eliminar';
 botonEliminar.style.background='#a32626';
-botonEliminar.addEventListener('click',()=>eliminarRegistro(tipo,item.id,tarjeta));
+botonEliminar.addEventListener('click',()=>eliminarRegistro(tipo,tipo==='cerdas'?item.codigo:item.id,tarjeta));
 tarjeta.appendChild(botonEliminar); 
 lista.prepend(tarjeta);
 }
