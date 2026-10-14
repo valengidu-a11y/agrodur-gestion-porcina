@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#173f2b">
+<title>AGRODUR | Gestión Porcina</title>
+<style>
+:root {
+  --verde:#173f2b;
+  --verde2:#286344;
+  --fondo:#f3f6f3;
+  --texto:#26352b;
+  --blanco:#fff;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--fondo);
+  color:var(--texto);
+}
+header {
+  background:var(--verde);
+  color:white;
+  padding:24px 18px;
+}
+.marca { font-size:12px; letter-spacing:3px; }
+h1 { margin:8px 0 4px; font-size:27px; }
+header p { margin:0; color:#d9e8dd; }
+main { padding:18px; max-width:900px; margin:auto; }
+h2 { font-size:20px; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.tarjeta {
+  background:white;
+  padding:17px;
+  border-radius:14px;
+  border:1px solid #e1e8e1;
+}
+.numero { font-size:27px; font-weight:700; color:var(--verde2); }
+.etiqueta { font-size:13px; color:#69776d; }
+nav {
+  display:flex; gap:8px; overflow-x:auto;
+  padding:12px 0;
+}
+button {
+  border:0; border-radius:9px; padding:12px 15px;
+  background:var(--verde2); color:white;
+  font-size:14px; cursor:pointer;
+}
+nav button { flex-shrink:0; }
+nav button.sec { background:white; color:var(--verde); border:1px solid #d8e1d9; }
+.seccion {
+  background:white; border-radius:14px; padding:18px;
+  margin-top:15px;
+}
+label { display:block; font-size:14px; margin:12px 0 6px; }
+input,select,textarea {
+  width:100%; padding:12px; border:1px solid #cbd7cd;
+  border-radius:8px; background:white; font:inherit;
+}
+.campo { margin-bottom:12px; }
+.oculto { display:none; }
+.nota { color:#68766c; font-size:13px; line-height:1.5; }
+footer { text-align:center; padding:25px; font-size:12px; color:#718075; }
+@media(min-width:650px) {
+  .grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="marca">AGRODUR · PRODUCCIÓN AGROPECUARIA</div>
+  <h1>Gestión Porcina</h1>
+  <p>Control y seguimiento de tu granja</p>
+</header>
+<main>
+  <nav>
+    <button onclick="mostrar('inicio')">Inicio</button>
+    <button class="sec" onclick="mostrar('cerdas')">Cerdas</button>
+    <button class="sec" onclick="mostrar('partos')">Partos</button>
+    <button class="sec" onclick="mostrar('lechones')">Lechones</button>
+    <button class="sec" onclick="mostrar('compostaje')">Compostaje</button>
+  </nav>
+
+  <section id="inicio">
+    <h2>Panel principal</h2>
+    <p class="nota">Bienvenida a tu sistema de gestión de la granja.</p>
+    <div class="grid">
+      <div class="tarjeta"><div class="numero" id="nCerdas">0</div><div class="etiqueta">Cerdas registradas</div></div>
+      <div class="tarjeta"><div class="numero" id="nPartos">0</div><div class="etiqueta">Partos registrados</div></div>
+      <div class="tarjeta"><div class="numero" id="nLechones">0</div><div class="etiqueta">Lechones registrados</div></div>
+      <div class="tarjeta"><div class="numero" id="nCompost">0</div><div class="etiqueta">Zonas de compostaje</div></div>
+    </div>
+    <div class="seccion">
+      <h2>Bienvenida a AGRODUR</h2>
+      <p>Registra la información de tu granja y lleva el seguimiento de las actividades productivas.</p>
+      <p class="nota">Esta versión inicial es una demostración. Los datos no están conectados todavía a una base de datos.</p>
+    </div>
+  </section>
+
+  <section id="cerdas" class="seccion oculto">
+    <h2>Registro de cerdas</h2>
+    <form onsubmit="registrar(event,'cerdas')">
+      <div class="campo"><label>Identificación de la cerda *</label><input name="id" required placeholder="Ej. CER-001"></div>
+      <div class="campo"><label>Fecha de nacimiento</label><input name="fecha" type="date"></div>
+      <div class="campo"><label>Estado</label><select name="estado"><option>Reemplazo</option><option>Vacía</option><option>En gestación</option><option>Próxima a parto</option><option>Lactancia</option></select></div>
+      <button>Registrar cerda</button>
+    </form>
+    <div id="listaCerdas"></div>
+  </section>
+
+  <section id="partos" class="seccion oculto">
+    <h2>Registro de partos</h2>
+    <form onsubmit="registrar(event,'partos')">
+      <div class="campo"><label>Identificación de la cerda *</label><input name="id" required placeholder="Ej. CER-001"></div>
+      <div class="campo"><label>Fecha del parto *</label><input name="fecha" type="date" required></div>
+      <div class="campo"><label>Nacidos vivos</label><input name="vivos" type="number" min="0" value="0" required></div>
+      <div class="campo"><label>Nacidos muertos</label><input name="muertos" type="number" min="0" value="0" required></div>
+      <button>Registrar parto</button>
+    </form>
+    <div id="listaPartos"></div>
+  </section>
+
+  <section id="lechones" class="seccion oculto">
+    <h2>Registro de lechones</h2>
+    <form onsubmit="registrar(event,'lechones')">
+      <div class="campo"><label>Identificación de camada o lechón *</label><input name="id" required placeholder="Ej. CAM-001"></div>
+      <div class="campo"><label>Fecha de nacimiento *</label><input name="fecha" type="date" required></div>
+      <div class="campo"><label>Cantidad de lechones</label><input name="cantidad" type="number" min="1" value="1" required></div>
+      <div class="campo"><label>Peso promedio en kg</label><input name="peso" type="number" min="0" step="0.1"></div>
+      <button>Registrar lechones</button>
+    </form>
+    <div id="listaLechones"></div>
+  </section>
+
+  <section id="compostaje" class="seccion oculto">
+    <h2>Gestión de compostaje</h2>
+    <form onsubmit="registrar(event,'compostaje')">
+      <div class="campo"><label>Nombre de la zona *</label><input name="id" required placeholder="Ej. Cama 1"></div>
+      <div class="campo"><label>Fecha de revisión *</label><input name="fecha" type="date" required></div>
+      <div class="campo"><label>Temperatura (°C)</label><input name="temperatura" type="number" step="0.1"></div>
+      <div class="campo"><label>Humedad (%)</label><input name="humedad" type="number" min="0" max="100"></div>
+      <div class="campo"><label>Actividad realizada</label><select name="actividad"><option>Inspección</option><option>Volteo</option><option>Ajuste de humedad</option><option>Adición de material</option><option>Otra</option></select></div>
+      <div class="campo"><label>Observaciones</label><textarea name="observaciones" rows="3"></textarea></div>
+      <button>Registrar revisión</button>
+    </form>
+    <div id="listaCompostaje"></div>
+  </section>
+</main>
+<footer>AGRODUR · Gestión Porcina</footer>
+
+<script>
+const datos = {
+  cerdas:[], partos:[], lechones:[], compostaje:[]
+};
+
+function mostrar(id) {
+  document.querySelectorAll('main > section').forEach(s => s.classList.add('oculto'));
+  document.getElementById(id).classList.remove('oculto');
+  window.scrollTo(0,0);
+}
+
+function registrar(event,tipo) {
+  event.preventDefault();
+  const form = event.target;
+  const item = Object.fromEntries(new FormData(form).entries());
+  datos[tipo].push(item);
+
+  const lista = document.getElementById('lista'+tipo[0].toUpperCase()+tipo.slice(1));
+  const tarjeta = document.createElement('div');
+  tarjeta.className = 'tarjeta';
+  tarjeta.style.marginTop = '12px';
+
+  Object.entries(item).forEach(([clave,valor]) => {
+    if (valor !== '') {
+      const p = document.createElement('p');
+      p.textContent = clave+': '+valor;
+      tarjeta.appendChild(p);
+    }
+  });
+  lista.prepend(tarjeta);
+  document.getElementById('nCerdas').textContent = datos.cerdas.length;
+  document.getElementById('nPartos').textContent = datos.partos.length;
+  document.getElementById('nLechones').textContent =
+    datos.lechones.reduce((s,x)=>s+Number(x.cantidad||0),0);
+  document.getElementById('nCompost').textContent = datos.compostaje.length;
+  form.reset();
+  alert('Registro agregado a esta sesión.');
+}
+</script>
+</body>
+</html>
