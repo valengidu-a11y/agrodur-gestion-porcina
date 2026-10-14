@@ -1123,9 +1123,18 @@ async function eliminarRegistro(tabla, id) {
   };
 
   if (!nombres[tabla]) return;
-  if (!confirm(`¿Seguro que deseas eliminar ${nombres[tabla]}? Esta acción no se puede deshacer.`)) return;
+  if (!confirm(`¿Seguro que deseas eliminar ${nombres[tabla]}? Esta acción no se puede deshacer.`)) const { data, error } = await db
+  .from(tabla)
+  .delete()
+  .eq('id', id)
+  .select('id');
 
-  const { error } = await db.from(tabla).delete().eq('id', id);
+if (!error && (!data || data.length === 0)) {
+  return mensaje(
+    'No se eliminó ningún registro. Verifica los permisos de Supabase.',
+    'error'
+  );
+}
 
   if (error) {
     if (error.code === '23503') {
