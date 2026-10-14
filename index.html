@@ -200,6 +200,7 @@ return;
 }
 const {data:perfil,error}=await cliente.from('perfiles').select('nombre,rol').eq('id',session.user.id).maybeSingle();
 if(error||!perfil){
+  alert('Error perfil: '+(error?.message||'No se encontró el perfil'));
 await cliente.auth.signOut();
 $('appContenido').hidden=true;
 $('acceso').hidden=false;
