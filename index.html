@@ -322,14 +322,24 @@ $('formAcceso').addEventListener('submit', async e => {
     return;
   }
 
+
 const columnaId = tipo === 'cerdas' ? 'codigo' : 'id';
-const {error}=await cliente.from(tabla).delete().eq(columnaId,id);
 
-  if(error){
-    alert('No se pudo eliminar: '+error.message);
-    return;
-  }
+const {data,error}=await cliente
+  .from(tabla)
+  .delete()
+  .eq(columnaId,id)
+  .select();
 
+if(error){
+  alert('Error al eliminar: '+error.message);
+  return;
+}
+
+if(!data || data.length===0){
+  alert('No se eliminó ningún registro. Revisa los permisos o el identificador.');
+  return;
+}
   tarjeta.remove();
   alert('Registro eliminado correctamente.');
 }
