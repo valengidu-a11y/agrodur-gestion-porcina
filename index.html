@@ -246,7 +246,7 @@ item={
   codigo:v.id.trim(),
   fecha_nacimiento:v.fecha||null,
   estado:v.estado.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
-};;
+};
 }
 if(tipo==='partos'){
 const {data:cerda,error}=await cliente.from('cerdas').select('id,codigo').eq('codigo',v.id.trim()).maybeSingle();
