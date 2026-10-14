@@ -166,6 +166,12 @@ p.textContent=k+': '+v;
 tarjeta.appendChild(p);
 }
 });
+ const botonEliminar=document.createElement('button');
+botonEliminar.type='button';
+botonEliminar.textContent='Eliminar';
+botonEliminar.style.background='#a32626';
+botonEliminar.addEventListener('click',()=>eliminarRegistro(tipo,item.id,tarjeta));
+tarjeta.appendChild(botonEliminar); 
 lista.prepend(tarjeta);
 }
 
@@ -295,6 +301,40 @@ $('formAcceso').addEventListener('submit', async e => {
 
 
 </script>
+  async function eliminarRegistro(tipo,id,tarjeta){
+  if(!id){
+    alert('No se puede eliminar: falta el ID del registro.');
+    return;
+  }
+
+  const tablaPorTipo={
+    cerdas:'cerdas',
+    partos:'partos',
+    lechones:'lechones',
+    compostaje:'compostaje'
+  };
+
+  const tabla=tablaPorTipo[tipo];
+  if(!tabla){
+    alert('Tipo de registro no válido.');
+    return;
+  }
+
+  if(!confirm('¿Seguro que deseas eliminar este registro? Esta acción no se puede deshacer.')){
+    return;
+  }
+
+const columnaId = tipo === 'cerdas' ? 'codigo' : 'id';
+const {error}=await cliente.from(tabla).delete().eq(columnaId,id);
+
+  if(error){
+    alert('No se pudo eliminar: '+error.message);
+    return;
+  }
+
+  tarjeta.remove();
+  alert('Registro eliminado correctamente.');
+}
 </body>
 </html>
 
