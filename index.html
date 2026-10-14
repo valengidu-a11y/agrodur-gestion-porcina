@@ -299,8 +299,6 @@ $('formAcceso').addEventListener('submit', async e => {
   await comprobarSesion(data.session);
 });
 
-
-</script>
   async function eliminarRegistro(tipo,id,tarjeta){
   if(!id){
     alert('No se puede eliminar: falta el ID del registro.');
@@ -335,6 +333,7 @@ const {error}=await cliente.from(tabla).delete().eq(columnaId,id);
   tarjeta.remove();
   alert('Registro eliminado correctamente.');
 }
+ </script>
 </body>
 </html>
 
