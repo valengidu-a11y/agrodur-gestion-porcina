@@ -286,7 +286,9 @@ $('compostList').querySelectorAll('[data-delete-compost]').forEach(b=>b.onclick=
 $('compostList').querySelectorAll('[data-edit-compost]').forEach(b=>b.onclick=()=>editCompost(b.dataset.editCompost));
 }
 function renderUpcoming(){
-const items=state.sows.filter(s=>s.estado==='gestante'||s.estado==='proxima_a_parto').map(s=>({sow:s,date:estimatedDue(s)})).filter(x=>x.date).sort((a,b)=>a.date.localeCompare(b.date));
+
+const items=state.sows.filter(s=>s.estado==='gestacion'||s.estado==='proxima_parto').map(s=>({sow:s,date:estimatedDue(s)})).filter(x=>x.date).sort((a,b)=>a.date.localeCompare(b.date));
+
 $('upcomingBirths').innerHTML=items.length?items.slice(0,8).map(x=>`<div class="record"><strong>${esc(x.sow.codigo)}</strong><p>Fecha estimada: ${fmt(x.date)}</p><span class="badge">${Math.round((new Date(x.date)-new Date(today()))/86400000)} días</span></div>`).join(''):'<div class="empty">No hay fechas de parto calculables. Registra la fecha de servicio en el módulo reproductivo cuando esté disponible.</div>';
 }
 function estimatedDue(s){
