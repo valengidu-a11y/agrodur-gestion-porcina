@@ -75,9 +75,10 @@ main{max-width:1120px;margin:auto;padding:16px 14px 100px}.hidden{display:none!i
        <div class="form-grid">
          <div class="field"><label>Código único *</label><input name="codigo" required maxlength="80" placeholder="Ej. CER-001"></div>
          <div class="field"><label>Fecha de nacimiento</label><input name="fecha_nacimiento" type="date"></div>
-         <div class="field"><label>Estado *</label><select name="estado" required><option value="reemplazo">Reemplazo</option><option value="vacia">Vacía</option><option value="servida">Servida</option><option value="gestante">Gestante</option><option value="proxima_a_parto">Próxima a parto</option><option value="lactancia">Lactancia</option><option value="retirada">Retirada</option></select></div>
-         <div class="field span2"><label>Observaciones</label><textarea name="observaciones" rows="2"></textarea></div>
-       </div>
+         
+<div class="field"><label>Estado *</label><select name="estado" required><option value="reemplazo">Reemplazo</option><option value="vacia">Vacía</option><option value="gestacion">Gestación</option><option value="proxima_parto">Próxima a parto</option><option value="lactancia">Lactancia</option><option value="inactiva">Inactiva</option></select></div>
+<div class="field span2"><label>Observaciones</label><textarea name="observaciones" rows="2"></textarea></div>
+
        <div class="record-actions"><button type="submit">Guardar cerda</button><button type="button" class="secondary" id="cancelSowEdit">Cancelar edición</button></div>
      </form>
    </div>
