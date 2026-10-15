@@ -2,219 +2,396 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#173f2b">
 <title>AGRODUR | Gestión Porcina</title>
-<style>
-:root{--verde:#173f2b;--verde2:#286344;--fondo:#f3f6f3;--texto:#26352b;--blanco:#fff}
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--fondo);color:var(--texto)}
-header{background:var(--verde);color:white;padding:24px 18px}.marca{font-size:12px;letter-spacing:3px}h1{margin:8px 0 4px;font-size:27px}header p{margin:0;color:#d9e8dd}
-main{padding:18px;max-width:900px;margin:auto}h2{font-size:20px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.tarjeta{background:white;padding:17px;border-radius:14px;border:1px solid #e1e8e1}.numero{font-size:27px;font-weight:700;color:var(--verde2)}.etiqueta{font-size:13px;color:#69776d}
-nav{display:flex;gap:8px;overflow-x:auto;padding:12px 0}button{border:0;border-radius:9px;padding:12px 15px;background:var(--verde2);color:white;font-size:14px;cursor:pointer}nav button{flex-shrink:0}nav button.sec{background:white;color:var(--verde);border:1px solid #d8e1d9}
-.seccion{background:white;border-radius:14px;padding:18px;margin-top:15px}label{display:block;font-size:14px;margin:12px 0 6px}input,select,textarea{width:100%;padding:12px;border:1px solid #cbd7cd;border-radius:8px;background:white;font:inherit}.campo{margin-bottom:12px}.oculto{display:none}.nota{color:#68766c;font-size:13px;line-height:1.5}footer{text-align:center;padding:25px;font-size:12px;color:#718075}
-#acceso{max-width:420px;margin:30px auto;padding:24px;background:white;border-radius:16px;box-shadow:0 4px 18px #0001}#appContenido[hidden]{display:none!important}#mensajeAcceso{font-size:14px;line-height:1.5}.acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.error{color:#a32626}.exito{color:#286344}
-@media(min-width:650px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--green:#173f2b;--green2:#286344;--bg:#f2f5f2;--ink:#26352b;--muted:#6a786e;--line:#dce5dd;--white:#fff;--red:#a32626;--amber:#8a5a00}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}button{border:0;border-radius:10px;background:var(--green2);color:white;padding:12px 15px;font-weight:600;cursor:pointer}button:disabled{opacity:.55}button.secondary{background:white;color:var(--green);border:1px solid var(--line)}button.danger{background:var(--red)}button.small{padding:8px 10px;font-size:13px}
+header{background:var(--green);color:white;padding:20px max(18px,calc((100vw - 1120px)/2));padding-top:calc(20px + env(safe-area-inset-top))}
+header .brand{font-size:11px;letter-spacing:3px;opacity:.85}header h1{margin:5px 0;font-size:27px}header p{margin:0;color:#dce9df}
+main{max-width:1120px;margin:auto;padding:16px 14px 100px}.hidden{display:none!important}.muted{color:var(--muted);font-size:13px}.status{margin:10px 0;padding:10px 12px;border-radius:9px;background:#e7efe8;color:var(--green);font-size:14px}.status.error{background:#fbe9e9;color:var(--red)}
+#login{max-width:440px;margin:40px auto;background:white;padding:24px;border-radius:18px;box-shadow:0 8px 30px #122b1b12}h2{font-size:21px;margin:0 0 14px}h3{font-size:17px;margin:0 0 10px}
+.field{margin:12px 0}.field label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}.field input,.field select,.field textarea,input.search,select.filter{width:100%;padding:12px;border:1px solid #cbd7cd;border-radius:9px;background:white;color:var(--ink)}.field textarea{resize:vertical}
+.topline{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}.tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 12px;scrollbar-width:thin}.tabs button{white-space:nowrap;flex-shrink:0}.tabs button.active{background:var(--green);box-shadow:0 2px 8px #173f2b20}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.card,.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:12px;min-width:0}.metric{font-size:29px;font-weight:750;color:var(--green2)}.metric-label{font-size:13px;color:var(--muted)}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}.span2{grid-column:1/-1}.record{padding:13px 0;border-bottom:1px solid var(--line)}.record:last-child{border-bottom:0}.record-title{font-weight:700}.record p{margin:4px 0;font-size:14px;overflow-wrap:anywhere}.record-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.badge{display:inline-block;border-radius:999px;padding:4px 8px;background:#e8f0e9;color:var(--green);font-size:12px}.badge.warn{background:#fff0d3;color:var(--amber)}.badge.red{background:#fbe8e8;color:var(--red)}.empty{padding:18px;text-align:center;color:var(--muted);font-size:14px}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}th{background:#f5f8f5}.footnote{font-size:12px;color:var(--muted);margin-top:12px}.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#ffffffed;backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:8px 5px calc(8px + env(safe-area-inset-bottom));display:flex;gap:4px;justify-content:space-around;z-index:10}.bottom-nav button{background:transparent;color:var(--muted);padding:8px 5px;font-size:11px;min-width:0;flex:1}.bottom-nav button.active{background:#e8f0e9;color:var(--green)}.bottom-nav .symbol{display:block;font-size:18px;margin-bottom:2px}
+@media(min-width:720px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.bottom-nav{position:static;border:0;background:transparent;backdrop-filter:none;max-width:1120px;margin:auto;padding:0 14px 8px}.bottom-nav button{font-size:13px;border:1px solid var(--line);background:white;border-radius:10px}.bottom-nav button.active{background:var(--green);color:white}}
+@media(max-width:520px){.form-grid{grid-template-columns:1fr}.span2{grid-column:auto}.topline{align-items:flex-start}.grid{gap:8px}.card,.panel{padding:13px}header h1{font-size:24px}}
+@media print{header,.tabs,.bottom-nav,button,#login,.no-print{display:none!important}body{background:white}main{padding:0;max-width:none}.panel,.card{break-inside:avoid;border:1px solid #ccc}}
+</style>
 </head>
 <body>
-<div id="acceso">
- <h2>Ingreso a AGRODUR</h2>
- <p class="nota">Inicia sesión con la cuenta autorizada de tu granja.</p>
- <form id="formAcceso">
-   <div class="campo"><label for="correoAcceso">Correo electrónico</label><input id="correoAcceso" type="email" required autocomplete="username"></div>
-   <div class="campo"><label for="claveAcceso">Contraseña</label><input id="claveAcceso" type="password" required autocomplete="current-password"></div>
-   <button type="submit" style="width:100%">Iniciar sesión</button>
-   <p id="mensajeAcceso" role="status"></p>
- </form>
-</div>
-<div id="appContenido" hidden>
-<header>
- <div class="marca">AGRODUR · PRODUCCIÓN AGROPECUARIA</div>
+<header id="appHeader" class="hidden">
+ <div class="brand">AGRODUR · PRODUCCIÓN AGROPECUARIA</div>
  <h1>Gestión Porcina</h1>
- <p>Control y seguimiento de tu granja</p>
+ <p>Control claro y práctico para tu granja</p>
 </header>
+ 
 <main>
- <div class="acciones"><span id="usuarioActual" class="nota"></span><button id="cerrarSesion" type="button">Cerrar sesión</button></div>
- <nav>
-   <button type="button" onclick="mostrar('inicio')">Inicio</button>
-   <button type="button" class="sec" onclick="mostrar('cerdas')">Cerdas</button>
-   <button type="button" class="sec" onclick="mostrar('partos')">Partos</button>
-   <button type="button" class="sec" onclick="mostrar('lechones')">Lechones</button>
-   <button type="button" class="sec" onclick="mostrar('compostaje')">Compostaje</button>
+<section id="login">
+ <h2>Ingreso a AGRODUR</h2>
+ <p class="muted">Inicia sesión con una cuenta autorizada por la administradora.</p>
+ <form id="loginForm">
+   <div class="field"><label for="email">Correo electrónico</label><input id="email" type="email" autocomplete="username" required></div>
+   <div class="field"><label for="password">Contraseña</label><input id="password" type="password" autocomplete="current-password" required></div>
+   <button id="loginButton" type="submit" style="width:100%">Iniciar sesión</button>
+   <div id="loginMessage" role="status" class="status hidden"></div>
+ </form>
+ <p class="footnote">El registro público está desactivado. Las cuentas deben crearse de forma segura desde la administración de usuarios.</p>
+</section>
+ 
+<section id="workspace" class="hidden">
+ <div class="topline">
+   <div><strong id="userLabel">Cuenta activa</strong><div class="muted" id="roleLabel"></div></div>
+   <button class="secondary small" id="logout">Cerrar sesión</button>
+ </div>
+ <div id="globalMessage" class="status hidden" role="status"></div>
+ <nav class="tabs" id="topTabs">
+   <button data-view="home" class="active">Inicio</button><button data-view="sows">Cerdas</button><button data-view="farrowings">Partos</button><button data-view="piglets">Lechones</button><button data-view="compost">Compostaje</button><button data-view="calendar">Calendario</button><button data-view="reports">Informes</button><button data-view="users" class="admin-only hidden">Usuarios</button>
  </nav>
- <section id="inicio">
-   <h2>Panel principal</h2><p class="nota">Bienvenida a tu sistema de gestión de la granja.</p>
+ 
+ <section id="view-home" class="view">
+   <div class="section-head"><div><h2>Panel principal</h2><div class="muted" id="todayLabel"></div></div><button id="refresh">Actualizar datos</button></div>
    <div class="grid">
-     <div class="tarjeta"><div class="numero" id="nCerdas">0</div><div class="etiqueta">Cerdas registradas</div></div>
-     <div class="tarjeta"><div class="numero" id="nPartos">0</div><div class="etiqueta">Partos registrados</div></div>
-     <div class="tarjeta"><div class="numero" id="nLechones">0</div><div class="etiqueta">Lechones registrados</div></div>
-     <div class="tarjeta"><div class="numero" id="nCompost">0</div><div class="etiqueta">Revisiones de compostaje</div></div>
+     <div class="card"><div class="metric" id="mSows">—</div><div class="metric-label">Cerdas registradas</div></div>
+     <div class="card"><div class="metric" id="mFarrowings">—</div><div class="metric-label">Partos registrados</div></div>
+     <div class="card"><div class="metric" id="mPiglets">—</div><div class="metric-label">Lechones registrados</div></div>
+     <div class="card"><div class="metric" id="mCompost">—</div><div class="metric-label">Revisiones de compostaje</div></div>
    </div>
-   <div class="seccion"><h2>Bienvenida a AGRODUR</h2><p>Los registros se guardan en la base de datos de la granja.</p><p id="estadoConexion" class="nota">Conectando...</p></div>
+   <div class="cards" style="margin-top:12px">
+     <div class="panel"><h3>Próximos partos</h3><div id="upcomingBirths" class="muted">Cargando…</div></div>
+     <div class="panel"><h3>Últimas revisiones</h3><div id="recentCompost" class="muted">Cargando…</div></div>
+   </div>
+   <p class="footnote">Las fechas probables se estiman a 114 días del servicio cuando se registre una fecha de servicio. Este cálculo debe confirmarlo el técnico/veterinario.</p>
  </section>
- <section id="cerdas" class="seccion oculto">
-   <h2>Registro de cerdas</h2>
-   <form onsubmit="registrar(event,'cerdas')">
-     <div class="campo"><label>Identificación de la cerda *</label><input name="id" required placeholder="Ej. CER-001"></div>
-     <div class="campo"><label>Fecha de nacimiento</label><input name="fecha" type="date"></div>
-     <div class="campo"><label>Estado</label><select name="estado"><option>Reemplazo</option><option>Vacía</option><option>En gestación</option><option>Próxima a parto</option><option>Lactancia</option></select></div>
-     <button type="submit">Registrar cerda</button>
-   </form><div id="listaCerdas"></div>
+ 
+ <section id="view-sows" class="view hidden">
+   <div class="panel">
+     <h2 id="sowFormTitle">Registrar cerda</h2>
+     <form id="sowForm">
+       <input type="hidden" name="id">
+       <div class="form-grid">
+         <div class="field"><label>Código único *</label><input name="codigo" required maxlength="80" placeholder="Ej. CER-001"></div>
+         <div class="field"><label>Fecha de nacimiento</label><input name="fecha_nacimiento" type="date"></div>
+         <div class="field"><label>Estado *</label><select name="estado" required><option value="reemplazo">Reemplazo</option><option value="vacia">Vacía</option><option value="servida">Servida</option><option value="gestante">Gestante</option><option value="proxima_a_parto">Próxima a parto</option><option value="lactancia">Lactancia</option><option value="retirada">Retirada</option></select></div>
+         <div class="field span2"><label>Observaciones</label><textarea name="observaciones" rows="2"></textarea></div>
+       </div>
+       <div class="record-actions"><button type="submit">Guardar cerda</button><button type="button" class="secondary" id="cancelSowEdit">Cancelar edición</button></div>
+     </form>
+   </div>
+   <div class="panel"><div class="section-head"><h2>Inventario de cerdas</h2><input id="sowSearch" class="search" style="max-width:260px" placeholder="Buscar por código o estado"></div><div id="sowList"></div></div>
  </section>
- <section id="partos" class="seccion oculto">
-   <h2>Registro de partos</h2>
-   <form onsubmit="registrar(event,'partos')">
-     <div class="campo"><label>Identificación de la cerda *</label><input name="id" required placeholder="Ej. CER-001"></div>
-     <div class="campo"><label>Fecha del parto *</label><input name="fecha" type="date" required></div>
-     <div class="campo"><label>Nacidos vivos</label><input name="vivos" type="number" min="0" value="0" required></div>
-     <div class="campo"><label>Nacidos muertos</label><input name="muertos" type="number" min="0" value="0" required></div>
-     <button type="submit">Registrar parto</button>
-   </form><div id="listaPartos"></div>
+ 
+ <section id="view-farrowings" class="view hidden">
+   <div class="panel">
+     <h2>Registrar parto</h2>
+     <form id="farrowingForm">
+       <div class="form-grid">
+         <div class="field"><label>Cerda *</label><select name="cerda_id" id="farrowingSow" required></select></div>
+         <div class="field"><label>Fecha del parto *</label><input name="fecha_parto" type="date" required></div>
+         <div class="field"><label>Nacidos vivos *</label><input name="nacidos_vivos" type="number" min="0" value="0" required></div>
+         <div class="field"><label>Nacidos muertos *</label><input name="nacidos_muertos" type="number" min="0" value="0" required></div>
+         <div class="field span2"><label>Observaciones</label><textarea name="observaciones" rows="2"></textarea></div>
+       </div><button type="submit">Guardar parto</button>
+     </form>
+   </div>
+   <div class="panel"><h2>Historial de partos</h2><div id="farrowingList"></div></div>
  </section>
- <section id="lechones" class="seccion oculto">
-   <h2>Registro de lechones</h2>
-   <form onsubmit="registrar(event,'lechones')">
-     <div class="campo"><label>Identificación de camada o lechón *</label><input name="id" required placeholder="Ej. CAM-001"></div>
-     <div class="campo"><label>Fecha de nacimiento *</label><input name="fecha" type="date" required></div>
-     <div class="campo"><label>Cantidad de lechones</label><input name="cantidad" type="number" min="1" value="1" required></div>
-     <div class="campo"><label>Peso promedio en kg</label><input name="peso" type="number" min="0" step="0.1"></div>
-     <button type="submit">Registrar lechones</button>
-   </form><div id="listaLechones"></div>
+ 
+ <section id="view-piglets" class="view hidden">
+   <div class="panel">
+     <h2>Registrar camada / lechones</h2>
+     <form id="pigletForm">
+       <div class="form-grid">
+         <div class="field"><label>Identificación de camada *</label><input name="identificacion" required placeholder="Ej. CAM-001"></div>
+         <div class="field"><label>Fecha de nacimiento *</label><input name="fecha_nacimiento" type="date" required></div>
+         <div class="field"><label>Cantidad *</label><input name="cantidad" type="number" min="1" step="1" required></div>
+         <div class="field"><label>Peso promedio (kg)</label><input name="peso_promedio_kg" type="number" min="0" step="0.1"></div>
+         <div class="field"><label>Fecha de destete</label><input name="fecha_destete" type="date"></div>
+         <div class="field span2"><label>Observaciones</label><textarea name="observaciones" rows="2"></textarea></div>
+       </div><button type="submit">Guardar camada</button>
+     </form>
+   </div>
+   <div class="panel"><h2>Camadas registradas</h2><div id="pigletList"></div></div>
  </section>
- <section id="compostaje" class="seccion oculto">
-   <h2>Gestión de compostaje</h2>
-   <form onsubmit="registrar(event,'compostaje')">
-     <div class="campo"><label>Nombre de la zona *</label><input name="id" required placeholder="Ej. Cama 1"></div>
-     <div class="campo"><label>Fecha de revisión *</label><input name="fecha" type="date" required></div>
-     <div class="campo"><label>Temperatura (°C)</label><input name="temperatura" type="number" step="0.1"></div>
-     <div class="campo"><label>Humedad (%)</label><input name="humedad" type="number" min="0" max="100"></div>
-     <div class="campo"><label>Actividad realizada</label><select name="actividad"><option>Inspección</option><option>Volteo</option><option>Ajuste de humedad</option><option>Adición de material</option><option>Otra</option></select></div>
-     <div class="campo"><label>Observaciones</label><textarea name="observaciones" rows="3"></textarea></div>
-     <button type="submit">Registrar revisión</button>
-   </form><div id="listaCompostaje"></div>
+ 
+ <section id="view-compost" class="view hidden">
+   <div class="panel">
+     <h2>Registrar revisión de compostaje</h2>
+     <form id="compostForm">
+       <div class="form-grid">
+         <div class="field"><label>Zona / cama *</label><input name="zona" required placeholder="Ej. Cama 1"></div>
+         <div class="field"><label>Fecha de revisión *</label><input name="fecha_revision" type="date" required></div>
+         <div class="field"><label>Temperatura (°C)</label><input name="temperatura_c" type="number" step="0.1"></div>
+         <div class="field"><label>Humedad (%)</label><input name="humedad_porcentaje" type="number" min="0" max="100" step="0.1"></div>
+         <div class="field"><label>Actividad</label><select name="actividad"><option>Inspección</option><option>Volteo</option><option>Ajuste de humedad</option><option>Adición de material</option><option>Retiro de material</option><option>Otra</option></select></div>
+         <div class="field span2"><label>Observaciones</label><textarea name="observaciones" rows="2"></textarea></div>
+       </div><button type="submit">Guardar revisión</button>
+     </form>
+   </div>
+   <div class="panel"><h2>Historial de compostaje</h2><div id="compostList"></div></div>
  </section>
+ 
+ <section id="view-calendar" class="view hidden">
+   <div class="panel"><h2>Calendario de actividades</h2><p class="muted">Esta vista combina fechas registradas en las tablas disponibles. Los eventos manuales y las tareas asignadas requieren una tabla adicional de calendario.</p><div class="field"><label>Mes</label><input type="month" id="calendarMonth"></div><div id="calendarList"></div></div>
+ </section>
+ 
+ <section id="view-reports" class="view hidden">
+   <div class="panel">
+     <div class="section-head"><h2>Informes</h2><div class="record-actions no-print"><button id="exportCsv">Exportar CSV</button><button id="printReport" class="secondary">Imprimir / PDF</button></div></div>
+     <div class="form-grid no-print">
+       <div class="field"><label>Desde</label><input id="reportFrom" type="date"></div>
+       <div class="field"><label>Hasta</label><input id="reportTo" type="date"></div>
+     </div>
+     <div id="reportSummary"></div>
+   </div>
+ </section>
+ 
+ <section id="view-users" class="view hidden">
+   <div class="panel"><h2>Administración de usuarios</h2>
+     <p>La lista muestra perfiles ya creados. Por seguridad, este HTML no puede crear usuarios de autenticación con privilegios administrativos ni cambiar contraseñas. La creación segura de cuentas requiere una función de servidor o el panel de Supabase Auth.</p>
+     <div id="userList"></div>
+     <p class="footnote">No se incluye una clave secreta de Supabase en el navegador. La clave pública no sustituye las políticas RLS de la base de datos.</p>
+   </div>
+ </section>
+</section>
 </main>
-<footer>AGRODUR · Gestión Porcina</footer>
-</div>
+ 
+<nav id="bottomNav" class="bottom-nav hidden" aria-label="Navegación principal">
+ <button data-view="home" class="active"><span class="symbol">⌂</span>Inicio</button>
+ <button data-view="sows"><span class="symbol">🐖</span>Cerdas</button>
+ <button data-view="farrowings"><span class="symbol">♡</span>Partos</button>
+ <button data-view="compost"><span class="symbol">♻</span>Compostaje</button>
+ <button data-view="reports"><span class="symbol">▤</span>Informes</button>
+</nav>
+ 
 <script>
-/* Pega aquí la URL y la clave publicable de tu proyecto Supabase. No uses una clave service_role o secreta. */
-const SUPABASE_URL = 'https://rlhqwdetkfcgfnlzcduk.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ReLPae7s8PaCXUgfiAMzlg_TRyqhEo4';
-const cliente = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-const datos = {cerdas:[],partos:[],lechones:[],compostaje:[]};
-const $ = id => document.getElementById(id);
-function mensaje(texto, clase='') { $('mensajeAcceso').textContent=texto; $('mensajeAcceso').className=clase; }
-function mostrar(id) {
- document.querySelectorAll('main > section').forEach(s=>s.classList.add('oculto'));
- $(id).classList.remove('oculto'); window.scrollTo(0,0);
+/* CONFIGURACIÓN: URL y clave pública del proyecto existente. Nunca pegar aquí la service_role key. */
+const SUPABASE_URL='https://rlhqwdetkfcgfnlzcduk.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_ReLPae7s8PaCXUgfiAMzlg_TRyqhEo4';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const $=id=>document.getElementById(id);
+const state={session:null,profile:null,sows:[],farrowings:[],piglets:[],compost:[],profiles:[]};
+const today=()=>new Date().toLocaleDateString('en-CA');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString('es-CO'):'—';
+const roleName=r=>({'Administradora':'Administradora','Administrador':'Administrador','Técnico/Veterinario':'Técnico/Veterinario','Tecnico/Veterinario':'Técnico/Veterinario','Operario':'Operario'}[r]||r||'Sin rol');
+function say(id,msg,error=false){const el=$(id);el.textContent=msg;el.classList.remove('hidden','error');if(error)el.classList.add('error')}
+function clearMsg(id){$(id).classList.add('hidden')}
+function isAdmin(){return ['Administradora','Administrador','admin','administradora'].includes(state.profile?.rol)}
+function canWrite(){return !!state.session}
+function showView(name){
+document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+$('view-'+name)?.classList.remove('hidden');
+document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
+if(name==='calendar')renderCalendar();
+if(name==='reports')renderReport();
+if(name==='users')loadProfiles();
+window.scrollTo({top:0,behavior:'smooth'});
 }
-function dibujar(tipo,item) {
- const lista = $('lista'+tipo[0].toUpperCase()+tipo.slice(1));
- const tarjeta = document.createElement('div'); tarjeta.className='tarjeta'; tarjeta.style.marginTop='12px';
- const campos = {
-   cerdas:[['Identificación',item.codigo],['Nacimiento',item.fecha_nacimiento],['Estado',item.estado]],
-   partos:[['Cerda',item._codigoCerda || item.cerda_id],['Fecha',item.fecha_parto],['Nacidos vivos',item.nacidos_vivos],['Nacidos muertos',item.nacidos_muertos]],
-   lechones:[['Identificación',item.identificacion],['Nacimiento',item.fecha_nacimiento],['Cantidad',item.cantidad],['Peso promedio (kg)',item.peso_promedio_kg]],
-   compostaje:[['Zona',item.zona],['Fecha revisión',item.fecha_revision],['Temperatura (°C)',item.temperatura_c],['Humedad (%)',item.humedad_porcentaje],['Actividad',item.actividad],['Observaciones',item.observaciones]]
- };
- (campos[tipo]||[]).forEach(([k,v])=>{if(v!==null&&v!==undefined&&v!==''){const p=document.createElement('p');p.textContent=k+': '+v;tarjeta.appendChild(p);}});
- lista.appendChild(tarjeta);
-}
-function actualizarContadores() {
- $('nCerdas').textContent=datos.cerdas.length;
- $('nPartos').textContent=datos.partos.length;
- $('nLechones').textContent=datos.lechones.reduce((s,x)=>s+Number(x.cantidad||0),0);
- $('nCompost').textContent=datos.compostaje.length;
-}
-async function cargarDatos() {
- const consultas = [
-   ['cerdas','cerdas','codigo,fecha_nacimiento,estado,id'],
-   ['partos','partos','id,cerda_id,fecha_parto,nacidos_vivos,nacidos_muertos'],
-   ['lechones','lechones','id,identificacion,fecha_nacimiento,cantidad,peso_promedio_kg'],
-   ['compostaje','compostaje','id,zona,fecha_revision,temperatura_c,humedad_porcentaje,actividad,observaciones']
- ];
- for (const [tipo,tabla,columnas] of consultas) {
-   const {data,error}=await cliente.from(tabla).select(columnas).order('creado_en',{ascending:false});
-   if(error) throw new Error('No se pudo cargar '+tabla+': '+error.message);
-   datos[tipo]=data||[];
-   $('lista'+tipo[0].toUpperCase()+tipo.slice(1)).replaceChildren();
-   if(tipo==='partos' && datos[tipo].length) {
-     for(const p of datos[tipo]) {
-       const {data:c}=await cliente.from('cerdas').select('codigo').eq('id',p.cerda_id).maybeSingle();
-       p._codigoCerda=c?.codigo||p.cerda_id;
-     }
-   }
-   datos[tipo].forEach(item=>dibujar(tipo,item));
- }
- actualizarContadores();
-}
-async function comprobarSesion(session) {
- if(!session){$('appContenido').hidden=true;$('acceso').hidden=false;return;}
- const {data:perfil,error}=await cliente.from('perfiles').select('nombre,rol').eq('id',session.user.id).maybeSingle();
- if(error||!perfil){await cliente.auth.signOut();$('appContenido').hidden=true;$('acceso').hidden=false;mensaje('Tu cuenta no tiene un perfil válido. Solicita a la administradora que revise tu acceso.','error');return;}
- $('acceso').hidden=true;$('appContenido').hidden=false;
- $('usuarioActual').textContent=(perfil.nombre||session.user.email)+' · '+perfil.rol;
- $('estadoConexion').textContent='Conectado a Supabase. Los datos se cargan desde la base de datos.';
- try { await cargarDatos(); } catch(e) {$('estadoConexion').textContent=e.message;$('estadoConexion').className='nota error';}
-}
-$('formAcceso').addEventListener('submit', async e => {
- e.preventDefault();
- const boton = $('formAcceso').querySelector('button[type="submit"]');
- boton.disabled = true;
- mensaje('Verificando acceso…');
- try {
-   if (SUPABASE_PUBLISHABLE_KEY.includes('PEGA_AQUI')) {
-     mensaje('Falta pegar la clave publicable de Supabase en el código.', 'error');
-     return;
-   }
-   const { data, error } = await cliente.auth.signInWithPassword({
-     email: $('correoAcceso').value.trim(),
-     password: $('claveAcceso').value
-   });
-   if (error) {
-     mensaje('No se pudo iniciar sesión: ' + error.message, 'error');
-     return;
-   }
-   // Procesar la sesión directamente después del inicio de sesión.
-   await comprobarSesion(data.session);
- } catch (error) {
-   console.error('Error en el inicio de sesión de AGRODUR:', error);
-   mensaje('No se pudo completar el acceso. Revisa tu conexión y la configuración de Supabase. Detalle: ' + (error?.message || error), 'error');
- } finally {
-   boton.disabled = false;
- }
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+$('todayLabel').textContent=new Date().toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+$('calendarMonth').value=today().slice(0,7);
+$('sowForm').querySelector('[name="fecha_nacimiento"]').max=today();
+$('farrowingForm').querySelector('[name="fecha_parto"]').max=today();
+$('pigletForm').querySelector('[name="fecha_nacimiento"]').max=today();
+$('compostForm').querySelector('[name="fecha_revision"]').max=today();
+ 
+$('loginForm').addEventListener('submit',async e=>{
+e.preventDefault();$('loginButton').disabled=true;say('loginMessage','Verificando acceso…');
+const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+$('loginButton').disabled=false;
+if(error){say('loginMessage','No se pudo iniciar sesión: '+error.message,true);return}
+await handleSession(data.session);
 });
-$('cerrarSesion').addEventListener('click',async()=>{await cliente.auth.signOut();location.reload();});
-async function registrar(event,tipo) {
- event.preventDefault();
- const form=event.target, v=Object.fromEntries(new FormData(form).entries());
- let tabla, item;
- if(tipo==='cerdas') {tabla='cerdas';item={codigo:v.id.trim(),fecha_nacimiento:v.fecha||null,estado:v.estado};}
- if(tipo==='partos') {
-   const {data:cerda,error:e}=await cliente.from('cerdas').select('id,codigo').eq('codigo',v.id.trim()).maybeSingle();
-   if(e||!cerda){alert('No encontré una cerda con ese código. Registra primero la cerda en el módulo Cerdas.');return;}
-   tabla='partos';item={cerda_id:cerda.id,fecha_parto:v.fecha,nacidos_vivos:Number(v.vivos),nacidos_muertos:Number(v.muertos)};
- }
- if(tipo==='lechones') {tabla='lechones';item={identificacion:v.id.trim(),fecha_nacimiento:v.fecha,cantidad:Number(v.cantidad),peso_promedio_kg:v.peso===''?null:Number(v.peso)};}
- if(tipo==='compostaje') {tabla='compostaje';item={zona:v.id.trim(),fecha_revision:v.fecha,temperatura_c:v.temperatura===''?null:Number(v.temperatura),humedad_porcentaje:v.humedad===''?null:Number(v.humedad),actividad:v.actividad,observaciones:v.observaciones||null};}
- const boton=form.querySelector('button[type="submit"]');boton.disabled=true;
- const {data,error}=await cliente.from(tabla).insert(item).select().single();boton.disabled=false;
- if(error){alert('No se pudo guardar el registro: '+error.message);return;}
- if(tipo==='partos') data._codigoCerda=v.id.trim();
- datos[tipo].unshift(data);dibujar(tipo,data);actualizarContadores();form.reset();
- alert('Registro guardado en Supabase.');
+$('logout').addEventListener('click',async()=>{await db.auth.signOut();location.reload()});
+$('refresh').addEventListener('click',loadAll);
+$('calendarMonth').addEventListener('change',renderCalendar);
+$('sowSearch').addEventListener('input',renderSows);
+$('cancelSowEdit').addEventListener('click',resetSowForm);
+$('exportCsv').addEventListener('click',exportCsv);
+$('printReport').addEventListener('click',()=>window.print());
+ 
+async function handleSession(session){
+state.session=session;
+if(!session){$('login').classList.remove('hidden');$('appHeader').classList.add('hidden');$('workspace').classList.add('hidden');$('bottomNav').classList.add('hidden');return}
+const {data:profile,error}=await db.from('perfiles').select('id,nombre,rol').eq('id',session.user.id).maybeSingle();
+if(error||!profile){await db.auth.signOut();say('loginMessage','Esta cuenta no tiene un perfil autorizado en la tabla perfiles. Solicita a la administradora que revise el acceso.',true);$('login').classList.remove('hidden');return}
+state.profile=profile;
+$('login').classList.add('hidden');$('appHeader').classList.remove('hidden');$('workspace').classList.remove('hidden');$('bottomNav').classList.remove('hidden');
+$('userLabel').textContent=profile.nombre||session.user.email;
+$('roleLabel').textContent=roleName(profile.rol);
+document.querySelectorAll('.admin-only').forEach(el=>el.classList.toggle('hidden',!isAdmin()));
+await loadAll();
 }
-cliente.auth.getSession().then(({data})=>comprobarSesion(data.session));
-// No consultar Supabase dentro del callback síncrono de auth: puede bloquear la sesión.
-cliente.auth.onAuthStateChange((_evento, session) => {
- if (session) window.setTimeout(() => comprobarSesion(session), 0);
- else {
-   $('appContenido').hidden = true;
-   $('acceso').hidden = false;
- }
+async function loadAll(){
+say('globalMessage','Actualizando datos…');
+const defs=[
+ ['sows','cerdas','id,codigo,fecha_nacimiento,estado,observaciones,creado_en','codigo'],
+ ['farrowings','partos','id,cerda_id,fecha_parto,nacidos_vivos,nacidos_muertos,observaciones,creado_en','fecha_parto'],
+ ['piglets','lechones','id,identificacion,fecha_nacimiento,cantidad,peso_promedio_kg,fecha_destete,observaciones,creado_en','fecha_nacimiento'],
+ ['compost','compostaje','id,zona,fecha_revision,temperatura_c,humedad_porcentaje,actividad,observaciones,creado_en','fecha_revision']
+];
+let errors=[];
+for(const [key,table,cols,sort] of defs){
+ const {data,error}=await db.from(table).select(cols).order(sort,{ascending:false});
+ if(error){errors.push(table+': '+error.message);state[key]=[]}else state[key]=data||[];
+}
+renderAll();
+if(errors.length)say('globalMessage','Hay módulos que no se pudieron cargar: '+errors.join(' | '),true);
+else say('globalMessage','Datos actualizados correctamente.');
+setTimeout(()=>clearMsg('globalMessage'),3500);
+}
+function renderAll(){
+$('mSows').textContent=state.sows.length;
+$('mFarrowings').textContent=state.farrowings.length;
+$('mPiglets').textContent=state.piglets.reduce((s,x)=>s+Number(x.cantidad||0),0);
+$('mCompost').textContent=state.compost.length;
+renderSows();renderFarrowings();renderPiglets();renderCompost();renderUpcoming();renderRecentCompost();fillSowSelect();renderCalendar();renderReport();
+}
+function renderSows(){
+const q=$('sowSearch').value.toLowerCase();
+const rows=state.sows.filter(x=>(x.codigo+' '+x.estado+' '+(x.observaciones||'')).toLowerCase().includes(q));
+$('sowList').innerHTML=rows.length?rows.map(x=>`<article class="record"><div class="record-title">${esc(x.codigo)} <span class="badge">${esc(x.estado||'Sin estado')}</span></div><p>Nacimiento: ${fmt(x.fecha_nacimiento)}</p><p>Observaciones: ${esc(x.observaciones||'—')}</p><div class="record-actions"><button class="secondary small" data-edit-sow="${esc(x.id)}">Editar</button><button class="danger small" data-delete-sow="${esc(x.id)}">Eliminar</button></div></article>`).join(''):'<div class="empty">No hay cerdas que coincidan con la búsqueda.</div>';
+$('sowList').querySelectorAll('[data-edit-sow]').forEach(b=>b.onclick=()=>editSow(b.dataset.editSow));
+$('sowList').querySelectorAll('[data-delete-sow]').forEach(b=>b.onclick=()=>deleteRecord('cerdas',b.dataset.deleteSow,'cerda'));
+}
+function fillSowSelect(){
+const sel=$('farrowingSow'),old=sel.value;
+sel.innerHTML='<option value="">Selecciona una cerda</option>'+state.sows.map(s=>`<option value="${esc(s.id)}">${esc(s.codigo)} · ${esc(s.estado||'')}</option>`).join('');
+if(state.sows.some(s=>s.id===old))sel.value=old;
+}
+function renderFarrowings(){
+const rows=[...state.farrowings].sort((a,b)=>(b.fecha_parto||'').localeCompare(a.fecha_parto||''));
+$('farrowingList').innerHTML=rows.length?rows.map(x=>{const sow=state.sows.find(s=>String(s.id)===String(x.cerda_id));return `<article class="record"><div class="record-title">Cerda: ${esc(sow?.codigo||'ID '+x.cerda_id)}</div><p>Fecha: ${fmt(x.fecha_parto)} · Vivos: ${Number(x.nacidos_vivos||0)} · Muertos: ${Number(x.nacidos_muertos||0)}</p><p>${esc(x.observaciones||'')}</p><div class="record-actions"><button class="danger small" data-delete-farrow="${esc(x.id)}">Eliminar</button></div></article>`}).join(''):'<div class="empty">Aún no hay partos registrados.</div>';
+$('farrowingList').querySelectorAll('[data-delete-farrow]').forEach(b=>b.onclick=()=>deleteRecord('partos',b.dataset.deleteFarrow,'parto'));
+}
+function renderPiglets(){
+$('pigletList').innerHTML=state.piglets.length?state.piglets.map(x=>`<article class="record"><div class="record-title">${esc(x.identificacion)}</div><p>Nacimiento: ${fmt(x.fecha_nacimiento)} · Cantidad: ${Number(x.cantidad||0)}</p><p>Peso promedio: ${x.peso_promedio_kg==null?'—':esc(x.peso_promedio_kg)+' kg'} · Destete: ${fmt(x.fecha_destete)}</p><p>${esc(x.observaciones||'')}</p><div class="record-actions"><button class="secondary small" data-edit-pig="${esc(x.id)}">Editar</button><button class="danger small" data-delete-pig="${esc(x.id)}">Eliminar</button></div></article>`).join(''):'<div class="empty">Aún no hay camadas registradas.</div>';
+$('pigletList').querySelectorAll('[data-delete-pig]').forEach(b=>b.onclick=()=>deleteRecord('lechones',b.dataset.deletePig,'camada'));
+$('pigletList').querySelectorAll('[data-edit-pig]').forEach(b=>b.onclick=()=>editPiglet(b.dataset.editPig));
+}
+function compostBadge(x){
+const t=Number(x.temperatura_c),h=Number(x.humedad_porcentaje);
+if(x.temperatura_c==null&&x.humedad_porcentaje==null)return '<span class="badge">Sin mediciones</span>';
+if((x.temperatura_c!=null&&(t<35||t>70))||(x.humedad_porcentaje!=null&&(h<30||h>70)))return '<span class="badge warn">Revisar mediciones</span>';
+return '<span class="badge">Mediciones registradas</span>';
+}
+function renderCompost(){
+$('compostList').innerHTML=state.compost.length?state.compost.map(x=>`<article class="record"><div class="record-title">${esc(x.zona)} · ${fmt(x.fecha_revision)}</div><p>Temperatura: ${x.temperatura_c==null?'—':esc(x.temperatura_c)+' °C'} · Humedad: ${x.humedad_porcentaje==null?'—':esc(x.humedad_porcentaje)+' %'}</p><p>Actividad: ${esc(x.actividad||'—')} · ${compostBadge(x)}</p><p>${esc(x.observaciones||'')}</p><div class="record-actions"><button class="secondary small" data-edit-compost="${esc(x.id)}">Editar</button><button class="danger small" data-delete-compost="${esc(x.id)}">Eliminar</button></div></article>`).join(''):'<div class="empty">Aún no hay revisiones de compostaje.</div>';
+$('compostList').querySelectorAll('[data-delete-compost]').forEach(b=>b.onclick=()=>deleteRecord('compostaje',b.dataset.deleteCompost,'revisión de compostaje'));
+$('compostList').querySelectorAll('[data-edit-compost]').forEach(b=>b.onclick=()=>editCompost(b.dataset.editCompost));
+}
+function renderUpcoming(){
+const items=state.sows.filter(s=>s.estado==='gestante'||s.estado==='proxima_a_parto').map(s=>({sow:s,date:estimatedDue(s)})).filter(x=>x.date).sort((a,b)=>a.date.localeCompare(b.date));
+$('upcomingBirths').innerHTML=items.length?items.slice(0,8).map(x=>`<div class="record"><strong>${esc(x.sow.codigo)}</strong><p>Fecha estimada: ${fmt(x.date)}</p><span class="badge">${Math.round((new Date(x.date)-new Date(today()))/86400000)} días</span></div>`).join(''):'<div class="empty">No hay fechas de parto calculables. Registra la fecha de servicio en el módulo reproductivo cuando esté disponible.</div>';
+}
+function estimatedDue(s){
+// La tabla actual de cerdas no contiene fecha de servicio; no se inventa una fecha.
+return s.fecha_probable_parto||null;
+}
+function renderRecentCompost(){
+const rows=[...state.compost].sort((a,b)=>(b.fecha_revision||'').localeCompare(a.fecha_revision||'')).slice(0,4);
+$('recentCompost').innerHTML=rows.length?rows.map(x=>`<div class="record"><strong>${esc(x.zona)}</strong><p>${fmt(x.fecha_revision)} · ${esc(x.actividad||'Revisión')}</p></div>`).join(''):'<div class="empty">Sin revisiones registradas.</div>';
+}
+function renderCalendar(){
+const month=$('calendarMonth').value||today().slice(0,7);
+const events=[];
+state.farrowings.forEach(x=>{if((x.fecha_parto||'').startsWith(month))events.push({date:x.fecha_parto,title:'Parto registrado',detail:(state.sows.find(s=>String(s.id)===String(x.cerda_id))?.codigo||'Cerda')+' · '+Number(x.nacidos_vivos||0)+' vivos'})});
+state.piglets.forEach(x=>{if((x.fecha_destete||'').startsWith(month))events.push({date:x.fecha_destete,title:'Destete registrado',detail:x.identificacion+' · '+x.cantidad+' lechones'})});
+state.compost.forEach(x=>{if((x.fecha_revision||'').startsWith(month))events.push({date:x.fecha_revision,title:'Revisión de compostaje',detail:x.zona+' · '+(x.actividad||'Actividad')})});
+events.sort((a,b)=>a.date.localeCompare(b.date));
+$('calendarList').innerHTML=events.length?events.map(e=>`<article class="record"><div class="record-title">${fmt(e.date)} · ${esc(e.title)}</div><p>${esc(e.detail)}</p></article>`).join(''):'<div class="empty">No hay eventos registrados para este mes.</div>';
+}
+function filteredRows(rows,dateKey){const from=$('reportFrom').value,to=$('reportTo').value;return rows.filter(x=>(!from||!x[dateKey]||x[dateKey]>=from)&&(!to||!x[dateKey]||x[dateKey]<=to))}
+function renderReport(){
+const f=filteredRows(state.farrowings,'fecha_parto'),p=filteredRows(state.piglets,'fecha_nacimiento'),c=filteredRows(state.compost,'fecha_revision');
+const alive=f.reduce((s,x)=>s+Number(x.nacidos_vivos||0),0),dead=f.reduce((s,x)=>s+Number(x.nacidos_muertos||0),0),qty=p.reduce((s,x)=>s+Number(x.cantidad||0),0);
+$('reportSummary').innerHTML=`<div class="grid"><div class="card"><div class="metric">${f.length}</div><div class="metric-label">Partos en el periodo</div></div><div class="card"><div class="metric">${alive}</div><div class="metric-label">Nacidos vivos registrados</div></div><div class="card"><div class="metric">${dead}</div><div class="metric-label">Nacidos muertos registrados</div></div><div class="card"><div class="metric">${qty}</div><div class="metric-label">Lechones en camadas registradas</div></div></div><h3 style="margin-top:18px">Resumen de compostaje</h3><p>Revisiones en el periodo: <strong>${c.length}</strong></p><p class="muted">Los indicadores reflejan únicamente los registros existentes y visibles para tu cuenta. No representan datos estimados.</p>`;
+}
+$('reportFrom').addEventListener('change',renderReport);$('reportTo').addEventListener('change',renderReport);
+ 
+function formObject(form){return Object.fromEntries(new FormData(form).entries())}
+function nullable(v){return v===''?null:v}
+$('sowForm').addEventListener('submit',async e=>{
+e.preventDefault();if(!canWrite())return;
+const f=e.currentTarget,v=formObject(f),id=v.id;
+const row={codigo:v.codigo.trim(),fecha_nacimiento:nullable(v.fecha_nacimiento),estado:v.estado,observaciones:nullable(v.observaciones)};
+await saveRow('cerdas',row,id,'cerda',f,resetSowForm);
 });
+function editSow(id){
+const x=state.sows.find(s=>String(s.id)===String(id));if(!x)return;
+const f=$('sowForm');f.elements.id.value=x.id;f.elements.codigo.value=x.codigo||'';f.elements.fecha_nacimiento.value=x.fecha_nacimiento||'';f.elements.estado.value=x.estado||'reemplazo';f.elements.observaciones.value=x.observaciones||'';
+$('sowFormTitle').textContent='Editar cerda '+x.codigo;showView('sows');window.scrollTo({top:0,behavior:'smooth'});
+}
+function resetSowForm(){const f=$('sowForm');f.reset();f.elements.id.value='';$('sowFormTitle').textContent='Registrar cerda'}
+$('farrowingForm').addEventListener('submit',async e=>{
+e.preventDefault();const f=e.currentTarget,v=formObject(f);
+const row={cerda_id:v.cerda_id,fecha_parto:v.fecha_parto,nacidos_vivos:Number(v.nacidos_vivos),nacidos_muertos:Number(v.nacidos_muertos),observaciones:nullable(v.observaciones)};
+await saveRow('partos',row,null,'parto',f);
+});
+$('pigletForm').addEventListener('submit',async e=>{
+e.preventDefault();const f=e.currentTarget,v=formObject(f);
+const row={identificacion:v.identificacion.trim(),fecha_nacimiento:v.fecha_nacimiento,cantidad:Number(v.cantidad),peso_promedio_kg:v.peso_promedio_kg===''?null:Number(v.peso_promedio_kg),fecha_destete:nullable(v.fecha_destete),observaciones:nullable(v.observaciones)};
+await saveRow('lechones',row,null,'camada',f);
+});
+function editPiglet(id){
+const x=state.piglets.find(s=>String(s.id)===String(id));if(!x)return;
+const f=$('pigletForm');for(const k of ['identificacion','fecha_nacimiento','cantidad','peso_promedio_kg','fecha_destete','observaciones'])f.elements[k].value=x[k]??'';
+// Editing uses a separate update action to avoid changing primary identifiers inadvertently.
+if(!f.elements.namedItem('edit_id')){const h=document.createElement('input');h.type='hidden';h.name='edit_id';f.appendChild(h)}
+f.elements.edit_id.value=x.id;const b=f.querySelector('button[type=submit]');b.textContent='Actualizar camada';showView('piglets');
+}
+$('compostForm').addEventListener('submit',async e=>{
+e.preventDefault();const f=e.currentTarget,v=formObject(f);
+const row={zona:v.zona.trim(),fecha_revision:v.fecha_revision,temperatura_c:v.temperatura_c===''?null:Number(v.temperatura_c),humedad_porcentaje:v.humedad_porcentaje===''?null:Number(v.humedad_porcentaje),actividad:v.actividad,observaciones:nullable(v.observaciones)};
+await saveRow('compostaje',row,null,'revisión',f);
+});
+function editCompost(id){
+const x=state.compost.find(s=>String(s.id)===String(id));if(!x)return;
+const f=$('compostForm');if(!f.elements.namedItem('edit_id')){const h=document.createElement('input');h.type='hidden';h.name='edit_id';f.appendChild(h)}
+f.elements.edit_id.value=x.id;for(const k of ['zona','fecha_revision','temperatura_c','humedad_porcentaje','actividad','observaciones'])f.elements[k].value=x[k]??'';
+f.querySelector('button[type=submit]').textContent='Actualizar revisión';showView('compost');
+}
+async function saveRow(table,row,id,label,form,onDone){
+const button=form.querySelector('button[type=submit]');button.disabled=true;
+try{
+ let result;
+ if(id){result=await db.from(table).update(row).eq('id',id).select().single()}
+ else if(form.elements.namedItem('edit_id')?.value){result=await db.from(table).update(row).eq('id',form.elements.edit_id.value).select().single()}
+ else{result=await db.from(table).insert(row).select().single()}
+ if(result.error){say('globalMessage','No se pudo guardar '+label+': '+result.error.message,true);return}
+ form.reset();if(form.elements.namedItem('id'))form.elements.id.value='';if(form.elements.namedItem('edit_id'))form.elements.edit_id.value='';button.textContent=table==='cerdas'?'Guardar cerda':table==='lechones'?'Guardar camada':table==='compostaje'?'Guardar revisión':'Guardar parto';
+ if(onDone)onDone();await loadAll();say('globalMessage','Registro guardado correctamente.');setTimeout(()=>clearMsg('globalMessage'),3000);
+}catch(err){say('globalMessage','Error inesperado: '+err.message,true)}finally{button.disabled=false}
+}
+async function deleteRecord(table,id,label){
+if(!confirm('¿Seguro que deseas eliminar este registro de '+label+'? Esta acción no se puede deshacer.'))return;
+const {data,error}=await db.from(table).delete().eq('id',id).select('id');
+if(error){say('globalMessage',error.code==='23503'?'No se puede eliminar porque existen registros relacionados. Conserva el historial y cambia el estado si corresponde.':'No se pudo eliminar: '+error.message,true);return}
+if(!data?.length){say('globalMessage','No se eliminó ningún registro. Revisa permisos o identificador.',true);return}
+await loadAll();say('globalMessage','Registro eliminado.');setTimeout(()=>clearMsg('globalMessage'),3000);
+}
+async function loadProfiles(){
+if(!isAdmin())return;
+const {data,error}=await db.from('perfiles').select('id,nombre,rol');
+if(error){$('userList').innerHTML='<p class="status error">No se pudo consultar perfiles: '+esc(error.message)+'</p>';return}
+state.profiles=data||[];
+$('userList').innerHTML=state.profiles.length?'<div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Rol</th><th>ID de usuario</th></tr></thead><tbody>'+state.profiles.map(p=>`<tr><td>${esc(p.nombre||'—')}</td><td>${esc(roleName(p.rol))}</td><td>${esc(p.id)}</td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">No hay perfiles visibles.</div>';
+}
+function exportCsv(){
+const lines=[['Tipo','Identificación','Fecha','Dato principal','Observaciones']];
+state.sows.forEach(x=>lines.push(['Cerda',x.codigo,x.fecha_nacimiento,x.estado,x.observaciones]));
+state.farrowings.forEach(x=>lines.push(['Parto',x.cerda_id,x.fecha_parto,`Vivos: ${x.nacidos_vivos}; muertos: ${x.nacidos_muertos}`,x.observaciones]));
+state.piglets.forEach(x=>lines.push(['Camada',x.identificacion,x.fecha_nacimiento,`Cantidad: ${x.cantidad}; peso: ${x.peso_promedio_kg??''}; destete: ${x.fecha_destete??''}`,x.observaciones]));
+state.compost.forEach(x=>lines.push(['Compostaje',x.zona,x.fecha_revision,`Temperatura: ${x.temperatura_c??''}; humedad: ${x.humedad_porcentaje??''}; actividad: ${x.actividad??''}`,x.observaciones]));
+const csv='\ufeff'+lines.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='AGRODUR-informe-'+today()+'.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>handleSession(session),0)});
+db.auth.getSession().then(({data,error})=>{if(error)say('loginMessage','No se pudo comprobar la sesión: '+error.message,true);else handleSession(data.session)});
 </script>
 </body>
 </html>
