@@ -355,11 +355,116 @@ const f=$('compostForm');if(!f.elements.namedItem('edit_id')){const h=document.c
 f.elements.edit_id.value=x.id;for(const k of ['zona','fecha_revision','temperatura_c','humedad_porcentaje','actividad','observaciones'])f.elements[k].value=x[k]??'';
 f.querySelector('button[type=submit]').textContent='Actualizar revisión';showView('compost');
 }
-async function saveRow(table,row,id,label,form,onDone){
-const button=form.querySelector('button[type=submit]');button.disabled=true;
-try{
- let result;
- if(id){result=await db.from(table).update(row).eq('id',id).select().single()}
+
+async function saveRow(table, row, id, label, form, onDone) {
+  const button = form.querySelector('button[type="submit"]');
+  const originalText = button.textContent;
+
+  if (!state.session) {
+    say('globalMessage',
+      'Tu sesión no está activa. Cierra sesión e ingresa nuevamente.',
+      true
+    );
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = 'Guardando...';
+
+  try {
+    const editField = form.elements.namedItem('edit_id');
+    const recordId = id || (editField ? editField.value : '');
+
+    let request;
+
+    if (recordId) {
+      request = db.from(table)
+        .update(row)
+        .eq('id', recordId)
+        .select('id');
+    } else {
+      request = db.from(table)
+        .insert(row)
+        .select('id');
+    }
+
+    const { data, error } = await request;
+
+    if (error) {
+      console.error('Error al guardar en AGRODUR:', {
+        table,
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
+
+      const detail = [
+        error.message,
+        error.details,
+        error.hint
+      ].filter(Boolean).join(' ');
+
+      say(
+        'globalMessage',
+        'No se pudo guardar ' + label +
+        '. Código: ' + (error.code || 'sin código') +
+        '. Detalle: ' + detail,
+        true
+      );
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      say(
+        'globalMessage',
+        'La operación no confirmó ningún registro. ' +
+        'Revisa los permisos de Supabase antes de volver a intentarlo.',
+        true
+      );
+      return;
+    }
+
+    form.reset();
+
+    if (form.elements.namedItem('id')) {
+      form.elements.namedItem('id').value = '';
+    }
+
+    if (editField) editField.value = '';
+
+    button.textContent =
+      table === 'cerdas' ? 'Guardar cerda' :
+      table === 'lechones' ? 'Guardar camada' :
+      table === 'compostaje' ? 'Guardar revisión' :
+      'Guardar parto';
+
+    if (onDone) onDone();
+
+    await loadAll();
+
+    say('globalMessage', 'Registro guardado correctamente.');
+    setTimeout(() => clearMsg('globalMessage'), 4000);
+
+  } catch (err) {
+    console.error('Error inesperado en AGRODUR:', err);
+
+    say(
+      'globalMessage',
+      'Error inesperado al guardar: ' +
+      (err.message || String(err)),
+      true
+    );
+
+  } finally {
+    button.disabled = false;
+
+    if (button.textContent === 'Guardando...') {
+      button.textContent = originalText;
+    }
+  }
+}
+
  else if(form.elements.namedItem('edit_id')?.value){result=await db.from(table).update(row).eq('id',form.elements.edit_id.value).select().single()}
  else{result=await db.from(table).insert(row).select().single()}
  if(result.error){say('globalMessage','No se pudo guardar '+label+': '+result.error.message,true);return}
