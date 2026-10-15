@@ -159,12 +159,32 @@ async function comprobarSesion(session) {
  $('estadoConexion').textContent='Conectado a Supabase. Los datos se cargan desde la base de datos.';
  try { await cargarDatos(); } catch(e) {$('estadoConexion').textContent=e.message;$('estadoConexion').className='nota error';}
 }
-$('formAcceso').addEventListener('submit',async e=>{
- e.preventDefault();mensaje('Verificando acceso…');
- if(SUPABASE_PUBLISHABLE_KEY.includes('PEGA_AQUI')){mensaje('Falta pegar la clave publicable de Supabase en el código.','error');return;}
- const {error}=await cliente.auth.signInWithPassword({email:$('correoAcceso').value.trim(),password:$('claveAcceso').value});
- if(error){mensaje('No se pudo iniciar sesión: '+error.message,'error');return;}
- mensaje('');
+$('formAcceso').addEventListener('submit', async e => {
+ e.preventDefault();
+ const boton = $('formAcceso').querySelector('button[type="submit"]');
+ boton.disabled = true;
+ mensaje('Verificando acceso…');
+ try {
+   if (SUPABASE_PUBLISHABLE_KEY.includes('PEGA_AQUI')) {
+     mensaje('Falta pegar la clave publicable de Supabase en el código.', 'error');
+     return;
+   }
+   const { data, error } = await cliente.auth.signInWithPassword({
+     email: $('correoAcceso').value.trim(),
+     password: $('claveAcceso').value
+   });
+   if (error) {
+     mensaje('No se pudo iniciar sesión: ' + error.message, 'error');
+     return;
+   }
+   // Procesar la sesión directamente después del inicio de sesión.
+   await comprobarSesion(data.session);
+ } catch (error) {
+   console.error('Error en el inicio de sesión de AGRODUR:', error);
+   mensaje('No se pudo completar el acceso. Revisa tu conexión y la configuración de Supabase. Detalle: ' + (error?.message || error), 'error');
+ } finally {
+   boton.disabled = false;
+ }
 });
 $('cerrarSesion').addEventListener('click',async()=>{await cliente.auth.signOut();location.reload();});
 async function registrar(event,tipo) {
@@ -187,7 +207,14 @@ async function registrar(event,tipo) {
  alert('Registro guardado en Supabase.');
 }
 cliente.auth.getSession().then(({data})=>comprobarSesion(data.session));
-cliente.auth.onAuthStateChange((_evento,session)=>{if(session) comprobarSesion(session);});
+// No consultar Supabase dentro del callback síncrono de auth: puede bloquear la sesión.
+cliente.auth.onAuthStateChange((_evento, session) => {
+ if (session) window.setTimeout(() => comprobarSesion(session), 0);
+ else {
+   $('appContenido').hidden = true;
+   $('acceso').hidden = false;
+ }
+});
 </script>
 </body>
 </html>
