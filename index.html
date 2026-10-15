@@ -200,13 +200,58 @@ $('farrowingForm').querySelector('[name="fecha_parto"]').max=today();
 $('pigletForm').querySelector('[name="fecha_nacimiento"]').max=today();
 $('compostForm').querySelector('[name="fecha_revision"]').max=today();
  
-$('loginForm').addEventListener('submit',async e=>{
-e.preventDefault();$('loginButton').disabled=true;say('loginMessage','Verificando acceso…');
-const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
-$('loginButton').disabled=false;
-if(error){say('loginMessage','No se pudo iniciar sesión: '+error.message,true);return}
-await handleSession(data.session);
+
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const button = $('loginButton');
+  button.disabled = true;
+  say('loginMessage', 'Verificando acceso…');
+
+  try {
+    const { data, error } = await Promise.race([
+      db.auth.signInWithPassword({
+        email: $('email').value.trim(),
+        password: $('password').value
+      }),
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error(
+            'La autenticación tardó demasiado. Comprueba tu conexión e inténtalo de nuevo.'
+          )),
+          15000
+        )
+      )
+    ]);
+
+    if (error) {
+      say('loginMessage',
+        'No se pudo iniciar sesión: ' + error.message, true);
+      return;
+    }
+
+    say('loginMessage', 'Acceso validado. Comprobando perfil…');
+
+    await Promise.race([
+      handleSession(data.session),
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error(
+            'El acceso respondió, pero la consulta del perfil sigue pendiente.'
+          )),
+          15000
+        )
+      )
+    ]);
+
+  } catch (err) {
+    console.error('Error de acceso AGRODUR:', err);
+    say('loginMessage', err.message || 'Error inesperado al iniciar sesión.', true);
+  } finally {
+    button.disabled = false;
+  }
 });
+
 $('logout').addEventListener('click',async()=>{await db.auth.signOut();location.reload()});
 $('refresh').addEventListener('click',loadAll);
 $('calendarMonth').addEventListener('change',renderCalendar);
