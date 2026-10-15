@@ -498,8 +498,46 @@ state.compost.forEach(x=>lines.push(['Compostaje',x.zona,x.fecha_revision,`Tempe
 const csv='\ufeff'+lines.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
 const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='AGRODUR-informe-'+today()+'.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
-db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>handleSession(session),0)});
-db.auth.getSession().then(({data,error})=>{if(error)say('loginMessage','No se pudo comprobar la sesión: '+error.message,true);else handleSession(data.session)});
+
+async function initializeAuth() {
+  try {
+    // Primero se comprueba la sesión existente.
+    const { data, error } = await db.auth.getSession();
+
+    if (error) {
+      say(
+        'loginMessage',
+        'No se pudo comprobar la sesión. Recarga la página e inténtalo de nuevo.',
+        true
+      );
+      console.error('Error de sesión:', error.message);
+      return;
+    }
+
+    // Después de comprobarla, registramos los cambios de sesión.
+    db.auth.onAuthStateChange((_event, session) => {
+      setTimeout(() => {
+        handleSession(session).catch(err => {
+          console.error('Error al procesar la sesión:', err);
+          say('loginMessage', 'No se pudo completar el acceso. Inténtalo de nuevo.', true);
+        });
+      }, 0);
+    });
+
+    await handleSession(data.session);
+
+  } catch (err) {
+    console.error('Error al iniciar AGRODUR:', err);
+    say(
+      'loginMessage',
+      'No se pudo iniciar la aplicación. Recarga la página e inténtalo de nuevo.',
+      true
+    );
+  }
+}
+
+initializeAuth();
+
 </script>
 </body>
 </html>
